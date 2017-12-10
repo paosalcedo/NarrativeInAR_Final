@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PanelCollider : MonoBehaviour {
+
+	public int panelNum;
 	public bool isTracking = false;
 	public LayerMask layerMask;
-	public GameObject panelToMyRight;
 	public GameObject panelToMyLeft;
+	public GameObject panelToMyRight;
 	// public GameObject somePanel_1;
 	// public GameObject
 	public List<PanelCollider> panels = new List<PanelCollider>();
@@ -14,10 +16,11 @@ public class PanelCollider : MonoBehaviour {
 	// Use this for initialization
 	public Vector3[] panelDirections = new Vector3[3];
 	// public float[] anglesToLeft = new float [3];
-	public float[] anglesToRight = new float[3];
-	public float[] distanceToRight = new float[3];
+	public float[] anglesToLeft = new float[3];
 	public float[] distanceToLeft = new float[3];
+	// public float[] distanceToRight = new float[3];
 	void Start () {
+		panelNum = GetComponentInChildren<Panel>().myNum;
  		// panels.AddRange(FindObjectsOfType<PanelCollider>());
 		// if(panels.Contains(this.gameObject.GetComponent<PanelCollider>())){
 		// 	panels.Remove(this.gameObject.GetComponent<PanelCollider>());
@@ -27,8 +30,10 @@ public class PanelCollider : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		GetNextPanelPosition();	
+		// GetNextPanelPosition();	
 		AddToTrackedPanels();
+		if(isTracking){
+		}
 	}
 
 
@@ -51,25 +56,25 @@ public class PanelCollider : MonoBehaviour {
 		for (int i = 0; i<3; i++){
 			if(panels[i].GetComponent<PanelCollider>().isTracking){
 				panelDirections[i] = transform.position - panels[i].transform.position;
-				distanceToRight[i] = Vector3.Distance(panels[i].transform.position, transform.position);
-				anglesToRight[i] = Vector3.Angle(panelDirections[i], -transform.right);
+				distanceToLeft[i] = Vector3.Distance(panels[i].transform.position, transform.position);
+				anglesToLeft[i] = Vector3.Angle(panelDirections[i], -transform.right);
 				// anglesToLeft[i] = Vector3.Angle(panelDirections[i], transform.right);
-				if(distanceToRight[i] <= 2f && anglesToRight[i] <= 10f){
-					panelToMyRight = panels[i].gameObject;
-				} else {
-					panelToMyRight = null;
-				}
-				if(distanceToRight[i] <= 2f && anglesToRight[i] >= 170f){
+				if(distanceToLeft[i] <= 5f && anglesToLeft[i] <= 25f){
 					panelToMyLeft = panels[i].gameObject;
 				} else {
 					panelToMyLeft = null;
+				}
+				if(distanceToLeft[i] <= 5f && anglesToLeft[i] >= 170f){
+					panelToMyRight = panels[i].gameObject;
+				} else {
+					panelToMyRight = null;
 				}
 			} else {
 				// panelToMyLeft = null;
 				// panelToMyRight = null;
 				panelDirections[i] = Vector3.zero;
-				distanceToRight[i] = 0;
-				anglesToRight[i] = 0;
+				distanceToLeft[i] = 0;
+				anglesToLeft[i] = 0;
 			}			
 		}
 		// if(panels[0].GetComponent<PanelCollider>().isTracking){
