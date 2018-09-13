@@ -10,17 +10,20 @@ using UnityEngine;
 using Vuforia;
 
 /// <summary>
-///     A custom handler that implements the ITrackableEventHandler interface.
+/// A custom handler that implements the ITrackableEventHandler interface.
+/// 
+/// Changes made to this file could be overwritten when upgrading the Vuforia version. 
+/// When implementing custom event handler behavior, consider inheriting from this class instead.
 /// </summary>
 public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandler
 {
-    #region PRIVATE_MEMBER_VARIABLES
+    #region PROTECTED_MEMBER_VARIABLES
 
     protected TrackableBehaviour mTrackableBehaviour;
 
-    #endregion // PRIVATE_MEMBER_VARIABLES
+    #endregion // PROTECTED_MEMBER_VARIABLES
 
-    #region UNTIY_MONOBEHAVIOUR_METHODS
+    #region UNITY_MONOBEHAVIOUR_METHODS
 
     protected virtual void Start()
     {
@@ -29,7 +32,13 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             mTrackableBehaviour.RegisterTrackableEventHandler(this);
     }
 
-    #endregion // UNTIY_MONOBEHAVIOUR_METHODS
+    protected virtual void OnDestroy()
+    {
+        if (mTrackableBehaviour)
+            mTrackableBehaviour.UnregisterTrackableEventHandler(this);
+    }
+
+    #endregion // UNITY_MONOBEHAVIOUR_METHODS
 
     #region PUBLIC_METHODS
 
@@ -47,15 +56,12 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         {
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
             OnTrackingFound();
-            //Change state to "TrackAngle"
-            //should only track angle WHEN TRACKABLE IS FOUND.
         }
         else if (previousStatus == TrackableBehaviour.Status.TRACKED &&
-                 newStatus == TrackableBehaviour.Status.NOT_FOUND)
+                 newStatus == TrackableBehaviour.Status.NO_POSE)
         {
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
             OnTrackingLost();
-            //don't track angle when tracking lost.
         }
         else
         {
@@ -68,7 +74,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     #endregion // PUBLIC_METHODS
 
-    #region PRIVATE_METHODS
+    #region PROTECTED_METHODS
 
     protected virtual void OnTrackingFound()
     {
@@ -87,11 +93,6 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         // Enable canvas':
         foreach (var component in canvasComponents)
             component.enabled = true;
-
-        //allow it to be searched by PanelCollider.
-        PanelCollider thisPanel;
-        thisPanel = GetComponent<PanelCollider>();
-        thisPanel.isTracking = true;
     }
 
 
@@ -112,11 +113,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         // Disable canvas':
         foreach (var component in canvasComponents)
             component.enabled = false;
-
-        PanelCollider thisPanel;
-        thisPanel = GetComponent<PanelCollider>();
-        thisPanel.isTracking = false;
     }
 
-    #endregion // PRIVATE_METHODS
+    #endregion // PROTECTED_METHODS
 }
